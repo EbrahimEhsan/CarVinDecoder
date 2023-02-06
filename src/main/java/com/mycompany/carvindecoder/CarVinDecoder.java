@@ -7,12 +7,10 @@ package com.mycompany.carvindecoder;
 import java.io.BufferedReader;
 import java.util.Scanner;
 import java.net.HttpURLConnection;
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.json.JSONString;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -26,41 +24,45 @@ public class CarVinDecoder {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
+        
 
-        // Example : 1HGCR2F35EA000787 2014
-        // System.out.println("Hello! Enter Year and Vin to Decode you Cars info: ");
-        String vin = "";
-        String year = "";
-        //String url = "https://vpic.nhtsa.dot.gov/api//vehicles/DecodeVin/" + vin + "?format=json&modelyear="+ year;
-        //RestTemplate restTemplate = new RestTemplate();
-        // ObjectMapper mapper = new ObjectMapper();
-
-        // System.out.println(url);
-        // Display();
-        readJson();
+        Display();
 
     }
-
-    public static void Display() {
+    /**
+     * Display method that displays the user friendly interface to enter user info for vehicle 
+     * @throws IOException 
+     */
+    public static void Display() throws IOException {
         Scanner input = new Scanner(System.in);
 
-        System.out.println("Welcome to Car Vin Decoder!");
+        System.out.println("Welcome to Car Vin Decoder! Enter Year and Vin to Decode you Cars info. \nExample, VIN - 1HGCR2F35EA000787, Year - 2014.");
         System.out.println("-----------------------------");
         System.out.println("");
         System.out.println("");
+        System.out.print("Enter the year of the vehicle: ");
+        String year = input.nextLine();
+        System.out.print("Enter the VIN number: ");
+        String vin = input.nextLine();
+        System.out.println("");
+        System.out.println("-----------------------------");
+        readJson(year, vin);
+
 
     }
-
-    public static void readJson() throws MalformedURLException, IOException {
-        String vin = "1HGCR2F35EA000787";
-        String year = "2014";
+    /**
+     * this method is reading the user input and parsing through the Json data then returning the info of that car
+     * @param year
+     * @param vin
+     * @throws MalformedURLException
+     * @throws IOException 
+     */
+    public static void readJson(String year, String vin) throws MalformedURLException, IOException {
+       
         String link = "https://vpic.nhtsa.dot.gov/api//vehicles/DecodeVin/" + vin + "?format=json&modelyear=" + year;
         URL url = new URL(link);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
-
-        int status = con.getResponseCode();
-        System.out.println(status);
 
         BufferedReader br = new BufferedReader(
         new InputStreamReader(con.getInputStream()));
@@ -77,9 +79,6 @@ public class CarVinDecoder {
         for (int i = 0; i < result.length(); i++) {
             JSONObject explrObject = result.getJSONObject(i);
 
-            //if (explrObject.getString("Error Code").toString() != "0") {
-            //    System.out.println(explrObject.get("Error Text").toString());
-            //}
             String value = explrObject.get("Value").toString();
             if (value != "null" && value != "") {
                 String variable = explrObject.getString("Variable").toString();
@@ -88,8 +87,9 @@ public class CarVinDecoder {
                     break;
                 }
 
-                System.out.println(variable);
+                System.out.println("- " + variable);
                 System.out.println(explrObject.get("Value").toString());
+                System.out.println("");
             }
 
         }
